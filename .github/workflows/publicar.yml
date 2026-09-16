@@ -24,7 +24,7 @@ jobs:
 
       - name: Ejecutar script de texto
         env:
-          PAGE_ID: ${{ secrets.PAGE_ID }}
+          PAGE_ID: ${{ secrets.PAGE_ID_2 }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN_5 }}
         run: python publicar.py
 
