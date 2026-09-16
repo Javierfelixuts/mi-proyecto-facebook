@@ -1,6 +1,10 @@
 name: Publicar en Facebook
 
 on:
+  schedule:
+    # Corre todos los días a las 15:00 UTC (9:00 AM hora México)
+    - cron: '0 15 * * *'
+  # Mantenemos esto para que PUEDAS probarlo manualmente con un clic cuando quieras:
   workflow_dispatch:
 
 jobs:
