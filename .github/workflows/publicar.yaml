@@ -1,0 +1,33 @@
+name: Publicar en Facebook
+
+on:
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Instalar librerías
+        run: pip install requests
+
+      - name: Ejecutar script de texto
+        env:
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: python publicar.py
+
+      - name: Guardar cambios en el JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add publicaciones.json
+          git commit -m "Auto: eliminar publicación enviada" || exit 0
+          git push
