@@ -4,41 +4,65 @@ import os
 import time
 import requests
 
-# Tomar credenciales de las variables de entorno de GitHub Actions
-PAGE_ID = os.environ.get("61588186526840")
+# Tomar credenciales de las variables de entorno de GitHub Actions (Secrets)
+PAGE_ID = os.environ.get("PAGE_ID")
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 
 
 def programar_publicacion(imagen_path, mensaje, timestamp):
-  url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/photos"
+    # Verificar si la imagen realmente existe en el proyecto
+    tiene_imagen = imagen_path and os.path.exists(imagen_path)
 
-  try:
-    with open(imagen_path, "rb") as image_file:
-      files = {"source": image_file}
-      data = {
-          "message": mensaje,
-          "published": "false",  # Vital para que quede programada
-          "scheduled_publish_time": timestamp,
-          "access_token": ACCESS_TOKEN,
-      }
+    try:
+        if tiene_imagen:
+            # Publicar/Programar con foto
+            url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/photos"
+            with open(imagen_path, "rb") as image_file:
+                files = {"source": image_file}
+                data = {
+                    "caption": mensaje,
+                    "published": "false",  # Vital para que quede programada
+                    "scheduled_publish_time": timestamp,
+                    "access_token": ACCESS_TOKEN,
+                }
+                response = requests.post(url, data=data, files=files)
+        else:
+            # Si no hay imagen, programar solo el texto en el feed
+            print(f"Aviso: La imagen '{imagen_path}' no existe. Programando solo texto...")
+            url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/feed"
+            data = {
+                "message": mensaje,
+                "published": "false",
+                "scheduled_publish_time": timestamp,
+                "access_token": ACCESS_TOKEN,
+            }
+            response = requests.post(url, data=data)
 
-      response = requests.post(url, data=data, files=files)
-      resultado = response.json()
+        resultado = response.json()
 
-      if "id" in resultado:
-        print(f"Éxito: Imagen {imagen_path} programada correctamente.")
-      else:
-        print(f"Error con {imagen_path}:", resultado)
+        if "id" in resultado:
+            print(f"Éxito: Publicación programada correctamente (ID: {resultado['id']}).")
+        else:
+            print(f"Error al programar:", resultado)
 
-  except Exception as e:
-    print(f"Excepción al procesar {imagen_path}: {e}")
+    except Exception as e:
+        print(f"Excepción al procesar la publicación: {e}")
 
 
 # Cargar el archivo de configuración
 if __name__ == "__main__":
-  with open("publicaciones.json", "r", encoding="utf-8") as f:
-    posts = json.load(f)
+    if not os.path.exists("publicaciones.json"):
+        print("El archivo publicaciones.json no existe.")
+        exit(1)
 
-  for post in posts:
-    programar_publicacion(post["imagen"], post["mensaje"], post["timestamp"])
-    time.sleep(3)  # Pausa de 3 segundos para evitar bloqueos por saturación
+    with open("publicaciones.json", "r", encoding="utf-8") as f:
+        posts = json.load(f)
+
+    for post in posts:
+        # Extraer datos soportando si 'imagen' o 'timestamp' faltan en algún objeto
+        imagen = post.get("imagen", "")
+        mensaje = post.get("mensaje", "")
+        timestamp = post.get("timestamp")
+
+        programar_publicacion(imagen, mensaje, timestamp)
+        time.sleep(3)  # Pausa de 3 segundos para evitar bloqueos por saturación
