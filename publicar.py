@@ -3,12 +3,13 @@ import json
 import requests
 
 PAGE_ID = os.environ.get("PAGE_ID_2")
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_5")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_6")
 
 JSON_FILE = "publicaciones.json"
 
 # Depuración para ver qué está leyendo Python en GitHub Actions
 print(f"DEBUG: PAGE_ID detectado es -> '{PAGE_ID}'")
+print(f"DEBUG: ACCESS_TOKEN detectado es -> '{ACCESS_TOKEN}'")
 
 def publicar_siguiente():
     if not os.path.exists(JSON_FILE):

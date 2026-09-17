@@ -25,7 +25,7 @@ jobs:
       - name: Ejecutar script de texto
         env:
           PAGE_ID_2: ${{ secrets.PAGE_ID_2 }}
-          ACCESS_TOKEN_5: ${{ secrets.ACCESS_TOKEN_5 }}
+          ACCESS_TOKEN_6: ${{ secrets.ACCESS_TOKEN_6 }}
         run: python publicar.py
 
       - name: Guardar cambios en el JSON
