@@ -3,7 +3,7 @@ import json
 import requests
 
 PAGE_ID = os.environ.get("PAGE_ID_2")
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_6")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_7")
 
 JSON_FILE = "publicaciones.json"
 
