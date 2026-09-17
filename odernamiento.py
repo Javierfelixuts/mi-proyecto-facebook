@@ -1,6 +1,6 @@
 import os
 
-def continuar_secuencia(carpeta_origen, carpeta_destino, inicio=746, prefijo="leccion"):
+def continuar_secuencia(carpeta_origen, carpeta_destino, inicio=1045, prefijo="leccion"):
     extensiones_validas = ('.jpg', '.jpeg', '.png', '.webp')
     
     # Obtener y ordenar las imágenes de la nueva carpeta
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     CARPETA_FINAL = "images/"
     
     # Número en el que debe continuar la secuencia
-    NUMERO_INICIAL = 746
+    NUMERO_INICIAL = 1045
     
     PREFIJO = ""
 
