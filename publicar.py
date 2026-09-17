@@ -1,5 +1,5 @@
-import os
 import json
+import os
 import requests
 
 PAGE_ID = os.environ.get("PAGE_ID_3")
@@ -7,47 +7,63 @@ ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_7")
 
 JSON_FILE = "publicaciones.json"
 
-# Depuración para ver qué está leyendo Python en GitHub Actions
-print(f"DEBUG: PAGE_ID detectado es -> '{PAGE_ID}'")
-print(f"DEBUG: ACCESS_TOKEN detectado es -> '{ACCESS_TOKEN}'")
 
 def publicar_siguiente():
-    if not os.path.exists(JSON_FILE):
-        print(f"El archivo {JSON_FILE} no existe.")
-        return
+  if not os.path.exists(JSON_FILE):
+    print(f"El archivo {JSON_FILE} no existe.")
+    return
 
-    with open(JSON_FILE, "r", encoding="utf-8") as f:
-        publicaciones = json.load(f)
+  with open(JSON_FILE, "r", encoding="utf-8") as f:
+    publicaciones = json.load(f)
 
-    if not publicaciones:
-        print("No hay publicaciones pendientes en la cola.")
-        return
+  if not publicaciones:
+    print("No hay publicaciones pendientes en la cola.")
+    return
 
-    post = publicaciones.pop(0)
-    mensaje = post.get("mensaje", "")
-    ruta_imagen = post.get("imagen", "")
+  # Extraer el primer post de la cola
+  post = publicaciones.pop(0)
 
-    tiene_imagen = ruta_imagen and os.path.exists(ruta_imagen)
+  # Construir el texto final concatenando los campos
+  titulo = post.get("titulo", "")
+  mensaje = post.get("mensaje", "")
+  desc_en = post.get("descripcion_ingles", "")
+  desc_es = post.get("descripcion_espanol", "")
+  hashtags = post.get("hashtags", "")
+  ruta_imagen = post.get("images", "")
 
-    if tiene_imagen:
-        print(f"Publicando en Facebook con imagen: {ruta_imagen}")
-        url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/photos"
-        payload = {"caption": mensaje, "access_token": ACCESS_TOKEN}
-        files = {"source": open(ruta_imagen, "rb")}
-        response = requests.post(url, data=payload, files=files)
-    else:
-        print("Publicando en Facebook solo texto...")
-        url = f"https://graph.facebook.com/v19.0/{PAGE_ID}/feed"
-        payload = {"message": mensaje, "access_token": ACCESS_TOKEN}
-        response = requests.post(url, data=payload)
+  texto_completo = (
+      f"📌 {titulo}\n\n"
+      f"💬 {mensaje}\n\n"
+      f"🇬🇧 {desc_en}\n\n"
+      f"🇪🇸 {desc_es}\n\n"
+      f"{hashtags}"
+  )
 
-    if response.status_code == 200:
-        print("¡Publicado en el muro con éxito!")
-        with open(JSON_FILE, "w", encoding="utf-8") as f:
-            json.dump(publicaciones, f, ensure_ascii=False, indent=2)
-    else:
-        print(f"Error al publicar en Facebook: {response.text}")
-        exit(1)
+  tiene_imagen = bool(ruta_imagen and os.path.exists(ruta_imagen))
+
+  if tiene_imagen:
+    print(f"Publicando en Facebook con imagen: {ruta_imagen}")
+    url = "https://graph.facebook.com/v19.0/me/photos"
+    payload = {"caption": texto_completo, "access_token": ACCESS_TOKEN}
+
+    with open(ruta_imagen, "rb") as img_file:
+      files = {"source": img_file}
+      response = requests.post(url, data=payload, files=files)
+  else:
+    print("Publicando en Facebook solo texto...")
+    url = "https://graph.facebook.com/v19.0/me/feed"
+    payload = {"message": texto_completo, "access_token": ACCESS_TOKEN}
+    response = requests.post(url, data=payload)
+
+  if response.status_code == 200:
+    print("¡Publicado en el muro con éxito!")
+    # Guardar el JSON actualizado sin la publicación procesada
+    with open(JSON_FILE, "w", encoding="utf-8") as f:
+      json.dump(publicaciones, f, ensure_ascii=False, indent=2)
+  else:
+    print(f"Error al publicar en Facebook: {response.text}")
+    exit(1)
+
 
 if __name__ == "__main__":
-    publicar_siguiente()
+  publicar_siguiente()
