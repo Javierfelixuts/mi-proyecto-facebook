@@ -7,6 +7,9 @@ ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_5")
 
 JSON_FILE = "publicaciones.json"
 
+# Depuración para ver qué está leyendo Python en GitHub Actions
+print(f"DEBUG: PAGE_ID detectado es -> '{PAGE_ID}'")
+
 def publicar_siguiente():
     if not os.path.exists(JSON_FILE):
         print(f"El archivo {JSON_FILE} no existe.")
