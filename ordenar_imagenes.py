@@ -10,7 +10,7 @@ def orden_natural(cadena):
 
 
 def continuar_secuencia(
-    carpeta_origen, carpeta_destino, inicio=447, prefijo="leccion"
+    carpeta_origen, carpeta_destino, inicio=1045, prefijo="leccion"
 ):
   extensiones_validas = ('.jpg', '.jpeg', '.png', '.webp')
 
@@ -59,7 +59,7 @@ def continuar_secuencia(
 if __name__ == "__main__":
   CARPETA_NUEVAS = "images/carpeta ordenada/ingles"
   CARPETA_FINAL = "images/carpeta ordenada/"
-  NUMERO_INICIAL = 447
+  NUMERO_INICIAL = 1045
   PREFIJO = ""
 
   continuar_secuencia(
